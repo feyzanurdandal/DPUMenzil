@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DPUMenzil.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260504114741_InitialCreate")]
+    [Migration("20260504122014_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -46,8 +46,8 @@ namespace DPUMenzil.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("KategoriId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("KategoriId")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("OlusturanKullaniciId")
                         .HasColumnType("uuid");
@@ -69,11 +69,12 @@ namespace DPUMenzil.Infrastructure.Migrations
 
             modelBuilder.Entity("DPUMenzil.Core.Entities.Kategori", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("uuid");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<string>("Aciklama")
+                        .HasColumnType("text");
 
                     b.Property<string>("Ad")
                         .IsRequired()
@@ -82,6 +83,38 @@ namespace DPUMenzil.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Kategoriler");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("a1b2c3d4-e5f6-4a1b-8c2d-1e2f3a4b5c6d"),
+                            Aciklama = "Yemek listesi ve kalite geri bildirimleri",
+                            Ad = "Yemekhane"
+                        },
+                        new
+                        {
+                            Id = new Guid("b2c3d4e5-f6a1-4b2c-9d3e-2f3a4b5c6d7e"),
+                            Aciklama = "Kampüs içi ulaşım ve saatler",
+                            Ad = "Ring Seferleri"
+                        },
+                        new
+                        {
+                            Id = new Guid("c3d4e5f6-a1b2-4c3d-0e4f-3a4b5c6d7e8f"),
+                            Aciklama = "Çalışma alanları ve kaynaklar",
+                            Ad = "Kütüphane"
+                        },
+                        new
+                        {
+                            Id = new Guid("d4e5f6a1-b2c3-4d4e-1f5a-4b5c6d7e8f9a"),
+                            Aciklama = "Kampüs güvenliği ve acil durumlar",
+                            Ad = "Güvenlik"
+                        },
+                        new
+                        {
+                            Id = new Guid("e5f6a1b2-c3d4-4e5f-2a6b-5c6d7e8f9a0b"),
+                            Aciklama = "Dersler ve sınav süreçleri hakkında",
+                            Ad = "Akademik"
+                        });
                 });
 
             modelBuilder.Entity("DPUMenzil.Core.Entities.Kullanici", b =>
@@ -121,7 +154,7 @@ namespace DPUMenzil.Infrastructure.Migrations
             modelBuilder.Entity("DPUMenzil.Core.Entities.Gonderi", b =>
                 {
                     b.HasOne("DPUMenzil.Core.Entities.Kategori", "Kategori")
-                        .WithMany()
+                        .WithMany("Gonderiler")
                         .HasForeignKey("KategoriId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -135,6 +168,11 @@ namespace DPUMenzil.Infrastructure.Migrations
                     b.Navigation("Kategori");
 
                     b.Navigation("OlusturanKullanici");
+                });
+
+            modelBuilder.Entity("DPUMenzil.Core.Entities.Kategori", b =>
+                {
+                    b.Navigation("Gonderiler");
                 });
 
             modelBuilder.Entity("DPUMenzil.Core.Entities.Kullanici", b =>

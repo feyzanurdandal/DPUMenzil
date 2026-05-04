@@ -1,8 +1,9 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
+
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
 namespace DPUMenzil.Infrastructure.Migrations
 {
@@ -16,9 +17,9 @@ namespace DPUMenzil.Infrastructure.Migrations
                 name: "Kategoriler",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Ad = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Ad = table.Column<string>(type: "text", nullable: false),
+                    Aciklama = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -52,7 +53,7 @@ namespace DPUMenzil.Infrastructure.Migrations
                     Durum = table.Column<int>(type: "integer", nullable: false),
                     AnonimMi = table.Column<bool>(type: "boolean", nullable: false),
                     OlusturanKullaniciId = table.Column<Guid>(type: "uuid", nullable: false),
-                    KategoriId = table.Column<int>(type: "integer", nullable: false),
+                    KategoriId = table.Column<Guid>(type: "uuid", nullable: false),
                     OlusturulmaTarihi = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -70,6 +71,18 @@ namespace DPUMenzil.Infrastructure.Migrations
                         principalTable: "Kullanicilar",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Kategoriler",
+                columns: new[] { "Id", "Aciklama", "Ad" },
+                values: new object[,]
+                {
+                    { new Guid("a1b2c3d4-e5f6-4a1b-8c2d-1e2f3a4b5c6d"), "Yemek listesi ve kalite geri bildirimleri", "Yemekhane" },
+                    { new Guid("b2c3d4e5-f6a1-4b2c-9d3e-2f3a4b5c6d7e"), "Kampüs içi ulaşım ve saatler", "Ring Seferleri" },
+                    { new Guid("c3d4e5f6-a1b2-4c3d-0e4f-3a4b5c6d7e8f"), "Çalışma alanları ve kaynaklar", "Kütüphane" },
+                    { new Guid("d4e5f6a1-b2c3-4d4e-1f5a-4b5c6d7e8f9a"), "Kampüs güvenliği ve acil durumlar", "Güvenlik" },
+                    { new Guid("e5f6a1b2-c3d4-4e5f-2a6b-5c6d7e8f9a0b"), "Dersler ve sınav süreçleri hakkında", "Akademik" }
                 });
 
             migrationBuilder.CreateIndex(

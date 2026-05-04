@@ -17,7 +17,7 @@ public class Gonderi
     public Guid OlusturanKullaniciId { get; set; }
     public Kullanici OlusturanKullanici { get; set; } = null!;
     
-    public int KategoriId { get; set; }
+    public Guid KategoriId { get; set; }
     public Kategori Kategori { get; set; } = null!;
 
     public DateTime OlusturulmaTarihi { get; set; } = DateTime.UtcNow;
