@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: dpumenzil_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=SIFRE_BURAYA 
+      - POSTGRES_DB=DPUMenzilDb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql # '/data' kısmını sildik
+
+volumes:
+  postgres_data:
