@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DPUMenzil.Infrastructure\DPUMenzil.Infrastructure.csproj" />
+    <ProjectReference Include="..\DPUMenzil.Core\DPUMenzil.Core.csproj" />
   </ItemGroup>
 
 </Project>

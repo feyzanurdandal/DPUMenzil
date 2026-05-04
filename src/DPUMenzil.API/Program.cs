@@ -1,5 +1,7 @@
 using DPUMenzil.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using DPUMenzil.Core.Interfaces;
+using DPUMenzil.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
+
+builder.Services.AddScoped<IKategoriRepository, KategoriRepository>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
