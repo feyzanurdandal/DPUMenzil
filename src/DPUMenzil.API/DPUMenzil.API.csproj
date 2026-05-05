@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DPUMenzil.Infrastructure\DPUMenzil.Infrastructure.csproj" />
     <ProjectReference Include="..\DPUMenzil.Core\DPUMenzil.Core.csproj" />
+    <ProjectReference Include="..\DPUMenzil.Application\DPUMenzil.Application.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/DPUMenzil.API/DPUMenzil.API.csproj" />
+    <Project Path="src/DPUMenzil.Application/DPUMenzil.Application.csproj" />
     <Project Path="src/DPUMenzil.Core/DPUMenzil.Core.csproj" />
     <Project Path="src/DPUMenzil.Infrastructure/DPUMenzil.Infrastructure.csproj" />
   </Folder>

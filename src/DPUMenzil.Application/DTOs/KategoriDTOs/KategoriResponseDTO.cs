@@ -1,4 +1,5 @@
-namespace DPUMenzil.Core.DTOs.KategoriDTOs;
+// 'Core' olan yeri 'Application' olarak güncelliyoruz
+namespace DPUMenzil.Application.DTOs.KategoriDTOs; 
 
 public class KategoriResponseDTO
 {
