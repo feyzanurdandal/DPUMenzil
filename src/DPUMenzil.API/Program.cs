@@ -2,6 +2,11 @@ using DPUMenzil.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using DPUMenzil.Core.Interfaces;
 using DPUMenzil.Infrastructure.Repositories;
+// Önce yukarıya using ekle:
+using DPUMenzil.Infrastructure.Services;
+using DPUMenzil.Application.Interfaces;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +20,8 @@ builder.Services.AddScoped<IKategoriRepository, KategoriRepository>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+// builder.Build() satırından önce ekle:
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 
 var app = builder.Build();
 

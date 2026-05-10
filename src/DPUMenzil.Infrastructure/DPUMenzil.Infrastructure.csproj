@@ -2,9 +2,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DPUMenzil.Core\DPUMenzil.Core.csproj" />
+    <ProjectReference Include="..\DPUMenzil.Application\DPUMenzil.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.7">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
