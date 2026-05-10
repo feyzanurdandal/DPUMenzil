@@ -1,62 +1,76 @@
-# 🚀 DPÜ Menzil
+# DPÜ Menzil | Akıllı Kampüs İletişim Platformu
 
-Dumlupınar Üniversitesi kampüs içi iletişim, duyuru ve geri bildirim platformu. Bu proje, **Clean Architecture** prensipleri ve **Siber Güvenlik** odaklı veritabanı mimarisi ile geliştirilmiştir.
+[![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![Cyber Security](https://img.shields.io/badge/Security-Focus-red?logo=dependabot)](https://github.com/features/security)
 
-## 🛠️ Teknolojiler
-*   **.NET 10 SDK**
-*   **Entity Framework Core** (PostgreSQL Provider)
-*   **Docker & Docker Compose**
-*   **PostgreSQL**
-*   **Swagger/OpenAPI**
+**DPÜ Menzil**, Kütahya Dumlupınar Üniversitesi öğrencileri ve personeli için geliştirilmiş; kampüs içi duyuru, geri bildirim ve anlık iletişim odaklı bir platformdur. Proje, modern yazılım mimarileri ve siber güvenlik standartları (OWASP prensipleri) göz önünde bulundurularak inşa edilmektedir.
 
-## 📂 Proje Klasör Yapısı
+---
 
-```text
-DPUMenzil/
-├── src/
-│   ├── DPUMenzil.API/             # Web API Katmanı (Controller, Program.cs)
-│   ├── DPUMenzil.Core/            # Core Katmanı (Entities, Enums)
-│   │   ├── Entities/              # Veritabanı Varlıkları (Kullanici, Gonderi)
-│   │   └── Enums/                 # Tanımlayıcı Sabitler (KullaniciRolu, GonderiDurumu)
-│   └── DPUMenzil.Infrastructure/  # Altyapı Katmanı (EF Core, Persistence)
-│       └── Persistence/           # DbContext ve Configuration Ayarları
-├── docker-compose.yml             # PostgreSQL Docker Konfigürasyonu
-├── DPUMenzil.sln                  # Solution (Çözüm) Dosyası
-└── README.md                      # Proje Dokümantasyonu
-```
+## Mimari Özellikler
 
-## 🏗️ Proje Yapısı
-*   **DPUMenzil.API:** Giriş noktası ve API uçları.
-*   **DPUMenzil.Core:** Domain modelleri (Entities), Enum yapıları ve temel iş mantığı.
-*   **DPUMenzil.Infrastructure:** Veritabanı yapılandırması (EF Core), Persistence klasörü ve dış servis entegrasyonları.
+Proje **Clean Architecture** (Temiz Mimari) prensiplerine sadık kalınarak 4 ana katman üzerine kurgulanmıştır:
 
-## 💻 Kurulum ve Çalıştırma
+* **API:** İsteklerin karşılandığı ve yetkilendirmelerin yapıldığı giriş noktası.
+* **Application:** İş mantığı, DTO yönetimi ve servislerin (Auth, Post vb.) bulunduğu beyin katmanı.
+* **Core (Domain):** Varlıklar (Entities) ve arayüzlerin (Interfaces) bulunduğu, dışa bağımlılığı olmayan merkez.
+* **Infrastructure:** Veritabanı yapılandırması (EF Core) ve dış kütüphane entegrasyonlarının (BCrypt) yönetildiği katman.
 
-Projeyi yerel ortamınızda ayağa kaldırmak için aşağıdaki adımları takip edin:
+---
 
-### 1. Gereksinimler
-*   Docker Desktop yüklü ve çalışır durumda olmalıdır.
-*   .NET 10 SDK yüklü olmalıdır.
+## Siber Güvenlik Yaklaşımı
 
-### 2. Veritabanını Başlatın (Docker)
-Proje ana dizininde PostgreSQL konteynerini ayağa kaldırın:
+* **Parola Güvenliği:** Kullanıcı şifreleri veritabanına asla düz metin olarak kaydedilmez. **BCrypt (Salted Hash)** algoritması ile korunur.
+* **Veri İzolasyonu:** Tahmin edilebilir ID saldırılarını (IDOR) önlemek amacıyla tüm tablolarda **UUID (Guid)** kullanılmaktadır.
+* **DTO Kullanımı:** Veritabanı modelleri asla doğrudan dışarıya açılmaz; veri transferleri DTO üzerinden güvenli bir şekilde yapılır.
+
+---
+
+## Kurulum ve Çalıştırma Rehberi
+
+Projeyi yerel ortamınızda çalıştırmak için aşağıdaki adımları sırasıyla uygulayın:
+
+### 1. Hazırlık
+* Bilgisayarınızda **Docker Desktop** ve **.NET 10 SDK** kurulu olduğundan emin olun.
+* Terminalden proje klasörüne gidin: `cd DPUMenzil`
+
+### 2. Veritabanını Başlatma (Docker)
+PostgreSQL konteynerini arka planda ayağa kaldırın:
 ```powershell
-docker-compose up -d
+docker compose up -d
 ```
-### 3. Veritabanı Şemasını Oluşturun (Migration)
-Tabloların PostgreSQL üzerinde fiziksel olarak oluşması için migration'ları uygulayın:
+
+### 3. Bağımlılıkların Yüklenmesi
+```powershell
+dotnet restore
+```
+
+### 4. Veritabanı Şemasını Güncelleme
+Migration'ları veritabanına uygulayarak tabloları oluşturun:
 ```powershell
 dotnet ef database update --project src\DPUMenzil.API
 ```
-### 4. Uygulamayı Çalıştırın
+
+### 5. Uygulamayı Başlatma
 ```powershell
 dotnet run --project src\DPUMenzil.API
 ```
+* **Swagger URL:** Uygulama çalıştıktan sonra http://localhost:5127/swagger adresinden API'yi test edebilirsiniz. (port numarası değişkenlik gösterebilir uygulamayı başlattıktan sonra terminalde hangi url üzerinden test edebileceğiniz görünür.)
 
-### Commit İşlemi
+---
+## Projeyi Kapatma ve Temizlik
 
+Çalışmanızı bitirdiğinizde sistem kaynaklarını serbest bırakmak için:
+
+### 1. API'yi Durdurun
+Terminalde Ctrl + C tuşlarına basın.
+
+### 2. Konteynerleri Kapatın:
 ```powershell
-git add .
-git commit -m "yaptıklarınızı buraya yazarak ekleyin"
-git push
+docker compose down
 ```
+---
+## Geliştirici
+Feyza Nur Dandal - Kütahya Dumlupınar Üniversitesi, Yazılım Mühendisliği
