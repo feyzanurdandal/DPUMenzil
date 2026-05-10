@@ -8,14 +8,16 @@ public class KullaniciConfiguration : IEntityTypeConfiguration<Kullanici>
 {
     public void Configure(EntityTypeBuilder<Kullanici> builder)
     {
-        builder.HasKey(k => k.Id);
-        
-        builder.Property(k => k.AdSoyad).IsRequired().HasMaxLength(100);
-        
-        // SİBER GÜVENLİK: E-posta benzersiz olmalı ve indexlenmeli
-        builder.HasIndex(k => k.Eposta).IsUnique();
-        builder.Property(k => k.Eposta).IsRequired().HasMaxLength(150);
-        
-        builder.Property(k => k.SifreHash).IsRequired();
+        builder.HasKey(x => x.Id);
+
+        // AdSoyad yerine Ad ve Soyad yapılandırması
+        builder.Property(x => x.Ad).IsRequired().HasMaxLength(50);
+        builder.Property(x => x.Soyad).IsRequired().HasMaxLength(50);
+
+        // Eposta yerine Email yapılandırması
+        builder.Property(x => x.Email).IsRequired().HasMaxLength(100);
+        builder.HasIndex(x => x.Email).IsUnique(); // Siber güvenlik için: Aynı maille iki kayıt olamaz
+
+        builder.Property(x => x.SifreHash).IsRequired();
     }
 }

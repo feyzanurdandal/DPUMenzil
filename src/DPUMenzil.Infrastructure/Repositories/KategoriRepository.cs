@@ -3,6 +3,7 @@ using DPUMenzil.Core.Interfaces;
 using DPUMenzil.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace DPUMenzil.Infrastructure.Repositories;
 
 public class KategoriRepository : IKategoriRepository

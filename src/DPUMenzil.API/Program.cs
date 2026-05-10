@@ -1,31 +1,34 @@
-using DPUMenzil.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
-using DPUMenzil.Core.Interfaces;
-using DPUMenzil.Infrastructure.Repositories;
-// Önce yukarıya using ekle:
-using DPUMenzil.Infrastructure.Services;
 using DPUMenzil.Application.Interfaces;
-
-
+using DPUMenzil.Application.Services;
+using DPUMenzil.Core.Interfaces;
+using DPUMenzil.Infrastructure.Persistence;
+using DPUMenzil.Infrastructure.Persistence.Repositories; // Klasör yolunu kontrol et
+using DPUMenzil.Infrastructure.Repositories;
+using DPUMenzil.Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. PostgreSQL Bağlantısını Kaydet
+// 1. PostgreSQL Bağlantısı
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+// 2. Repository Kayıtları
+builder.Services.AddScoped<IKullaniciRepository, KullaniciRepository>(); // Kritik eksik burasıydı!
 builder.Services.AddScoped<IKategoriRepository, KategoriRepository>();
+
+// 3. Servis Kayıtları (Siber Güvenlik ve İş Mantığı)
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-// builder.Build() satırından önce ekle:
-builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 
 var app = builder.Build();
 
-// 2. OTOMASYON: Uygulama her çalıştığında veritabanını kontrol et ve tabloları oluştur
+// 4. OTOMASYON: Migration'ları otomatik uygula
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
