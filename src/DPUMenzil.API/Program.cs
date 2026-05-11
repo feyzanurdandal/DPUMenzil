@@ -46,6 +46,7 @@ builder.Services.AddScoped<IKategoriRepository, KategoriRepository>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IGonderiRepository, GonderiRepository>();
 
 builder.Services.AddControllers();
 

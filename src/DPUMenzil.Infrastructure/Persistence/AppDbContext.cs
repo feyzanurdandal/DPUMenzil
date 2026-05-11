@@ -16,10 +16,32 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Fluent API konfigürasyonlarını otomatik yükler
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-        // Başlangıç Kategorileri (Seed Data)
+        // 🚀 1. Gonderi - OlusturanKullanici İlişkisi
+        modelBuilder.Entity<Gonderi>()
+            .HasOne(g => g.OlusturanKullanici)
+            .WithMany() 
+            .HasForeignKey(g => g.OlusturanKullaniciId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // 🚀 2. Gonderi - Kategori İlişkisi
+        modelBuilder.Entity<Gonderi>()
+            .HasOne(g => g.Kategori)
+            .WithMany()
+            .HasForeignKey(g => g.KategoriId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // 🚀 3. Enum -> String Dönüşümleri (Siber Güvenlik ve Okunabilirlik İçin)
+        modelBuilder.Entity<Gonderi>()
+            .Property(g => g.Tur)
+            .HasConversion<string>();
+
+        modelBuilder.Entity<Gonderi>()
+            .Property(g => g.Durum)
+            .HasConversion<string>();
+
+        // 🌱 Seed Data (Kategoriler)
         modelBuilder.Entity<Kategori>().HasData(
             new Kategori { Id = Guid.Parse("a1b2c3d4-e5f6-4a1b-8c2d-1e2f3a4b5c6d"), Ad = "Yemekhane", Aciklama = "Yemek listesi ve kalite geri bildirimleri" },
             new Kategori { Id = Guid.Parse("b2c3d4e5-f6a1-4b2c-9d3e-2f3a4b5c6d7e"), Ad = "Ring Seferleri", Aciklama = "Kampüs içi ulaşım ve saatler" },
