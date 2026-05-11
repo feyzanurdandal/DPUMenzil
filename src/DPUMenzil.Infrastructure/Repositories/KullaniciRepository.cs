@@ -2,8 +2,8 @@ using DPUMenzil.Core.Entities;
 using DPUMenzil.Core.Interfaces;
 using DPUMenzil.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+namespace DPUMenzil.Infrastructure.Repositories; // Bu satır çok önemli
 
-namespace DPUMenzil.Infrastructure.Persistence.Repositories;
 
 
 public class KullaniciRepository : IKullaniciRepository

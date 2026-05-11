@@ -9,26 +9,28 @@ public class AuthService : IAuthService
 {
     private readonly IKullaniciRepository _kullaniciRepository;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly IJwtService _jwtService; // Yeni eklendi
 
-    public AuthService(IKullaniciRepository kullaniciRepository, IPasswordHasher passwordHasher)
+    public AuthService(
+        IKullaniciRepository kullaniciRepository, 
+        IPasswordHasher passwordHasher, 
+        IJwtService jwtService) // Constructor güncellendi
     {
         _kullaniciRepository = kullaniciRepository;
         _passwordHasher = passwordHasher;
+        _jwtService = jwtService;
     }
 
     public async Task<string> RegisterAsync(UserRegisterDTO registerDto)
     {
-        // 1. E-posta kontrolü (Aynı e-posta ile başkası var mı?)
         var mevcutKullanici = await _kullaniciRepository.GetByEmailAsync(registerDto.Email);
         if (mevcutKullanici != null)
         {
             throw new Exception("Bu e-posta adresi zaten kullanımda.");
         }
 
-        // 2. Şifreyi siber güvenlik standartlarında hashle
         string hashedSifre = _passwordHasher.HashPassword(registerDto.Sifre);
 
-        // 3. Entity oluştur (DTO'dan Entity'ye map)
         var yeniKullanici = new Kullanici
         {
             Id = Guid.NewGuid(),
@@ -40,7 +42,6 @@ public class AuthService : IAuthService
             KayitTarihi = DateTime.UtcNow
         };
 
-        // 4. Veritabanına kaydet
         await _kullaniciRepository.AddAsync(yeniKullanici);
 
         return "Kayıt başarıyla tamamlandı. Artık giriş yapabilirsiniz.";
@@ -50,19 +51,14 @@ public class AuthService : IAuthService
     {
         // 1. Kullanıcıyı bul
         var kullanici = await _kullaniciRepository.GetByEmailAsync(loginDto.Email);
-        if (kullanici == null)
+        
+        // 2. Kullanıcı var mı ve şifre doğru mu kontrol et (Siber güvenlik için mesajları birleştirdik)
+        if (kullanici == null || !_passwordHasher.VerifyPassword(loginDto.Sifre, kullanici.SifreHash))
         {
             throw new Exception("E-posta veya şifre hatalı.");
         }
 
-        // 2. Şifreyi siber güvenlik motorumuzla doğrula
-        bool sifreDogruMu = _passwordHasher.VerifyPassword(loginDto.Sifre, kullanici.SifreHash);
-        if (!sifreDogruMu)
-        {
-            throw new Exception("E-posta veya şifre hatalı.");
-        }
-
-        // 3. Şimdilik düz metin dönüyoruz, bir sonraki adımda buraya JWT ekleyeceğiz
-        return "Giriş başarılı! (JWT Token yakında eklenecek)";
+        // 3. Başarılı giriş sonrası Token üret ve dön
+        return _jwtService.GenerateToken(kullanici);
     }
 }
