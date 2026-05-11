@@ -57,7 +57,7 @@ dotnet ef database update --project src\DPUMenzil.API
 ```powershell
 dotnet run --project src\DPUMenzil.API
 ```
-* **Swagger URL:** Uygulama çalıştıktan sonra http://localhost:5127/swagger adresinden API'yi test edebilirsiniz. (port numarası değişkenlik gösterebilir uygulamayı başlattıktan sonra terminalde hangi url üzerinden test edebileceğiniz görünür.)
+* **Scaler URL:** Uygulama çalıştıktan sonra http://localhost:5127/scalar/v1 adresinden API'yi test edebilirsiniz. (port numarası değişkenlik gösterebilir uygulamayı başlattıktan sonra terminalde hangi port üzerinden test edebileceğiniz görünür.)
 
 ---
 ## Projeyi Kapatma ve Temizlik
