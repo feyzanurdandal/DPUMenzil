@@ -8,14 +8,15 @@ using DPUMenzil.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi; 
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. JWT Yapılandırması ve Ayarları Okuma
+// 1. JWT Yapılandırması
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["Secret"] ?? throw new InvalidOperationException("JWT Secret bulunamadı!");
 
-// 2. Authentication (Kimlik Doğrulama) Şemasını Kaydetme
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -35,27 +36,61 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// 3. PostgreSQL Bağlantısı
+// 2. Veritabanı
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
-// 4. Repository Kayıtları
+// 3. DI Kayıtları
 builder.Services.AddScoped<IKullaniciRepository, KullaniciRepository>();
 builder.Services.AddScoped<IKategoriRepository, KategoriRepository>();
-
-// 5. Servis Kayıtları (JWT, Hashing ve İş Mantığı)
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
-builder.Services.AddScoped<IJwtService, JwtService>(); // Yeni eklendi
+builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// 🚀 4. MODERN YOL: OpenAPI (Interface Uyumlu Versiyon)
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
+    {
+        var scheme = new OpenApiSecurityScheme
+        {
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "JWT tokenınızı buraya yapıştırın."
+        };
+
+        // HATA ÇÖZÜMÜ: '??=' hatasını engellemek için doğrudan interface tipiyle oluşturuyoruz
+        document.Components ??= new OpenApiComponents();
+        
+        if (document.Components.SecuritySchemes == null)
+        {
+            document.Components.SecuritySchemes = new Dictionary<string, IOpenApiSecurityScheme>();
+        }
+        
+        if (!document.Components.SecuritySchemes.ContainsKey("Bearer"))
+        {
+            document.Components.SecuritySchemes.Add("Bearer", scheme);
+        }
+
+        // Güvenlik gereksinimini ekleme
+        var requirement = new OpenApiSecurityRequirement();
+        var schemeReference = new OpenApiSecuritySchemeReference("Bearer", document);
+
+        requirement.Add(schemeReference, new List<string>());
+        
+        document.Security ??= new List<OpenApiSecurityRequirement>();
+        document.Security.Add(requirement);
+
+        return Task.CompletedTask;
+    });
+});
 
 var app = builder.Build();
 
-// 6. OTOMASYON: Migration'ları uygula
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -64,13 +99,15 @@ using (var scope = app.Services.CreateScope())
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi(); 
+    app.MapScalarApiReference(options => 
+    {
+        options.WithTitle("DPÜ Menzil API")
+               .WithTheme(ScalarTheme.Moon);
+    });
 }
 
-// 7. Middleware Sıralaması (Kritik: Önce Authentication sonra Authorization)
 app.UseAuthentication(); 
 app.UseAuthorization();
-
 app.MapControllers();
 app.Run();

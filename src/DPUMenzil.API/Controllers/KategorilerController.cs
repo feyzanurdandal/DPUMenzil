@@ -1,5 +1,6 @@
-using DPUMenzil.Application.DTOs.KategoriDTOs; // 'Core' yerine 'Application' yazdık
+using DPUMenzil.Application.DTOs.KategoriDTOs;
 using DPUMenzil.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization; // Güvenlik için eklendi
 using Microsoft.AspNetCore.Mvc;
 
 namespace DPUMenzil.API.Controllers;
@@ -15,13 +16,16 @@ public class KategorilerController : ControllerBase
         _kategoriRepository = kategoriRepository;
     }
 
+    /// <summary>
+    /// Tüm kategorileri listeler.
+    /// [Authorize] sayesinde sadece giriş yapmış (geçerli token sahibi) kullanıcılar erişebilir.
+    /// </summary>
     [HttpGet]
+    [Authorize] 
     public async Task<ActionResult<IEnumerable<KategoriResponseDTO>>> GetKategoriler()
     {
         var kategoriler = await _kategoriRepository.GetAllAsync();
 
-        // GÜVENLİK NOTU: Entity'yi (Kategori) asla doğrudan dönmüyoruz.
-        // Onu sadece ihtiyacımız olan alanları içeren DTO'ya map ediyoruz.
         var response = kategoriler.Select(k => new KategoriResponseDTO
         {
             Id = k.Id,
@@ -31,4 +35,11 @@ public class KategorilerController : ControllerBase
 
         return Ok(response);
     }
+
+    /* GÜVENLİK NOTU: 
+       Kategori ekleme, silme veya güncelleme gibi işlemleri 
+       sadece 'Admin' rolüne sahip olanların yapabilmesi için:
+       [Authorize(Roles = "Admin")] 
+       özniteliğini kullanacağız.
+    */
 }
