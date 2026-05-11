@@ -48,7 +48,12 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IGonderiRepository, GonderiRepository>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Enum değerlerini sayı yerine isim (string) olarak JSON'a basar
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
 
 // 🚀 4. MODERN YOL: OpenAPI (Interface Uyumlu Versiyon)
 builder.Services.AddOpenApi(options =>
